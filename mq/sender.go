@@ -62,7 +62,7 @@ func (s *Sender) UpdateService(serviceName string, updatedServiceSpec map[string
     return service, nil
 }
 
-func (s *Sender) InvokeService(serviceName string, serviceParams []byte]) (string, error) {
+func (s *Sender) InvokeService(serviceName string, serviceParams []byte) (string, error) {
     s, err := NewSenderFromConfig()
     if err != nil {
         return "Error encountered when instantianting sender.", errors.New(err.Error())
