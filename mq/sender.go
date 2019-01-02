@@ -4,7 +4,6 @@
 package mq
 
 import (
-    "fmt"
     "github.com/streadway/amqp"
     "errors"
 )
@@ -14,25 +13,31 @@ type MessageSender interface {
     ListServices() ([]string, error)
     GetServiceByName(serviceName string) (map[string]interface{}, error)
     AddService(serviceSpec map[string]interface{}) (map[string]interface{}, error)
-    DeleteService(serviceName, string) error
+    DeleteService(serviceName string) error
     UpdateService(serviceName string, updatedServiceSpec map[string]interface{}) (map[string]interface{}, error)
     InvokeService(serviceName string, serviceParams []byte) (string, error)
 }
 
 type Sender struct {
+    mqChannel      *amqp.Channel
     config        *Config
 }
 
-func NewSenderFromConfig(config *config) (MessageSender, error) {
+func NewSenderFromConfig(config *Config) (MessageSender, error) {
     conn, err := amqp.Dial(config.RabbitURL)
     if err != nil {
         return nil, errors.New("Could not connect to MQ!")
     }
     defer conn.Close()
 
-    s, sErr := conn.Channel()
+    ch, sErr := conn.Channel()
     if sErr != nil {
         return nil, errors.New("Could not open channel to create sender!")
+    }
+
+    s := Sender{
+        mqChannel: ch,
+        config:    config,
     }
     return &s, nil
 }
@@ -63,12 +68,8 @@ func (s *Sender) UpdateService(serviceName string, updatedServiceSpec map[string
 }
 
 func (s *Sender) InvokeService(serviceName string, serviceParams []byte) (string, error) {
-    s, err := NewSenderFromConfig()
-    if err != nil {
-        return "Error encountered when instantianting sender.", errors.New(err.Error())
-    }
     body := serviceParams
-    q, err := s.QueueDeclare(
+    q, err := s.mqChannel.QueueDeclare(
         "android",
         false,
         false,
@@ -80,7 +81,7 @@ func (s *Sender) InvokeService(serviceName string, serviceParams []byte) (string
         return "Error encountered when declaring queue.", errors.New(err.Error())
     }
 
-    publishErr := s.Publish(
+    publishErr := s.mqChannel.Publish(
         "",
         q.Name,
         false,
