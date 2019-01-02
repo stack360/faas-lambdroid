@@ -16,7 +16,7 @@ func MakeFunctionReader(messageSender mq.MessageSender) VarsWrapper {
             http.Error(w, err.Error(), http.StatusInternalServerError)
             return
         }
-        functionBytes := string(functions[:])
+        functionBytes := []byte(functions[:])
         w.Header().Set("Content-Type", "application/json")
         w.WriteHeader(http.StatusOK)
         w.Write(functionBytes)

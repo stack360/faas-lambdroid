@@ -23,7 +23,7 @@ func MakeDeployHandler(messageSender mq.MessageSender) VarsWrapper {
             w.WriteHeader(http.StatusBadRequest)
             return
         }
-        servicSpec := map[string]interface{} {}
+        serviceSpec := map[string]interface{} {}
         _, addErr := messageSender.AddService(serviceSpec)
         if addErr != nil {
             w.WriteHeader(http.StatusInternalServerError)

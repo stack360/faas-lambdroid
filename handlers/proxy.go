@@ -5,13 +5,13 @@ package handlers
 
 import (
     "net/http"
-    
+
     "github.com/stack360/faas-mq/mq"
 
     "io/ioutil"
 )
 
-func MakeProxy(messageSender mq.MessageSender, stackName string) Vars {
+func MakeProxy(messageSender mq.MessageSender, stackName string) VarsWrapper {
     return func(w http.ResponseWriter, r *http.Request, vars map[string]string) {
 
         if r.Method != "POST" {
@@ -25,10 +25,10 @@ func MakeProxy(messageSender mq.MessageSender, stackName string) Vars {
         status, err := messageSender.InvokeService(serviceName, serviceParams)
         if err != nil {
             w.WriteHeader(http.StatusInternalServerError)
-            w.Write(status)
+            w.Write([]byte(status))
         }
 
         w.WriteHeader(http.StatusOK)
-        w.Write(status)
+        w.Write([]byte(status))
     }
 }

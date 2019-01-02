@@ -37,11 +37,11 @@ func MakeDeleteHandler(messageSender mq.MessageSender) VarsWrapper {
             w.WriteHeader(http.StatusNotFound)
             return
         }
-        delErr := messageSender.DeleteService(service)
+        delErr := messageSender.DeleteService(request.FunctionName)
         if delErr != nil {
             w.WriteHeader(http.StatusBadRequest)
             return
         }
-        w.WriteHeader(StatusOK)
+        w.WriteHeader(http.StatusOK)
     }
 }

@@ -4,11 +4,8 @@
 package handlers
 
 import (
-    "encoding/json"
-    "io/ioutil"
     "net/http"
 
-    "github.com/openfaas/faas/gateway/requests"
     "github.com/stack360/faas-mq/mq"
 )
 
