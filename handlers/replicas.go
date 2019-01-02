@@ -16,7 +16,7 @@ func MakeReplicaUpdater(messageSender mq.MessageSender) VarsWrapper {
     return func(w http.ResponseWriter, r *http.Request, vars map[string]string) {
         serviceName := vars["name"]
         updates := make(map[string]string)
-        _, err != messageSender.UpdateService(serviceName, updates)
+        _, err := messageSender.UpdateService(serviceName, updates)
         if err != nil {
             w.WriteHeader(http.StatusInternalServerError)
             w.Write([]byte(err.Error()))

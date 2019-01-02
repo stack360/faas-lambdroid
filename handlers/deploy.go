@@ -24,10 +24,10 @@ func MakeDeployHandler(messageSender mq.MessageSender) VarsWrapper {
             return
         }
         servicSpec := map[string]interface{} {}
-        _, err := messageSender.AddService(serviceSpec)
-        if err != nil {
+        _, addErr := messageSender.AddService(serviceSpec)
+        if addErr != nil {
             w.WriteHeader(http.StatusInternalServerError)
-            w.Write([]byte(err.Error()))
+            w.Write([]byte(addErr.Error()))
             return
         }
         w.WriteHeader(http.StatusAccepted)

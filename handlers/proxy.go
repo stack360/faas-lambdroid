@@ -4,9 +4,8 @@
 package handlers
 
 import (
-    "bytes"
     "net/http"
-
+    
     "github.com/stack360/faas-mq/mq"
 
     "io/ioutil"
