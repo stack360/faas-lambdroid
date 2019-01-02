@@ -1,5 +1,5 @@
-// Copyright (c) Xicheng Chang 2018. All rights reserved.
-// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+// Copyright (c) Xicheng Chang 2018-2019. All rights reserved.
+// Licensed under the MIT license.
 
 package mq
 
