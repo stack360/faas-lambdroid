@@ -10,7 +10,6 @@ import (
 
     "github.com/openfaas/faas/gateway/requests"
     "github.com/stack360/faas-mq/mq"
-    "github.com/stack360/faas-mq/types"
 )
 
 func MakeReplicaUpdater(messageSender mq.MessageSender) VarsWrapper {
