@@ -85,10 +85,10 @@ func (s *Sender) InvokeService(serviceName string, serviceParams []byte) (string
         q.Name,
         false,
         false,
-        amqp.Publishing(
+        amqp.Publishing{
             ContentType: "text/plain",
             Body:        body,
-        ),
+        },
     )
     if publishErr != nil {
         return "Error encountered when publishing message.", errors.New(err.Error())
