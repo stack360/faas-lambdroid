@@ -21,7 +21,7 @@ func main() {
 	rabbitURL := os.Getenv("RABBIT_URL")
 
 
-	// creates the rancher client config
+	// creates the MQ config
 	config, err := mq.NewMQConfig(
 		rabbitURL,
 	)
@@ -29,7 +29,7 @@ func main() {
 		panic(err.Error())
 	}
 
-	// create the rancher REST client
+	// create the message sender
 	mqSender, err := mq.NewSenderFromConfig(config)
 	if err != nil {
 		panic(err.Error())
