@@ -10,8 +10,8 @@ type Config struct {
 }
 
 func NewMQConfig(url string) (*Config, error) {
-    config := Config(
-        RabbitURL:          url,
-    )
+    config := Config{
+        RabbitURL: url,
+    }
     return &config, nil
 }
