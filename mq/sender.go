@@ -70,7 +70,7 @@ func (s *Sender) UpdateService(serviceName string, updatedServiceSpec map[string
 func (s *Sender) InvokeService(serviceName string, serviceParams []byte) (string, error) {
     body := serviceParams
     q, err := s.mqChannel.QueueDeclare(
-        "android",
+        serviceName,
         false,
         false,
         false,

@@ -5,8 +5,6 @@ package main
 
 import (
 	"fmt"
-	"net"
-	"net/http"
 	"os"
 	"time"
 
@@ -36,6 +34,7 @@ func main() {
 	}
 	fmt.Println("Created New MQ Sender.")
 
+/*
 	proxyClient := http.Client{
 		Transport: &http.Transport{
 			Proxy: http.ProxyFromEnvironment,
@@ -49,8 +48,9 @@ func main() {
 			ExpectContinueTimeout: 1500 * time.Millisecond,
 		},
 	}
+	*/
 	bootstrapHandlers := bootTypes.FaaSHandlers{
-		FunctionProxy:  handlers.MakeProxy(&proxyClient, config.FunctionsStackName).ServeHTTP,
+		FunctionProxy:  handlers.MakeProxy(mqSender, config.FunctionsStackName).ServeHTTP,
 		DeleteHandler:  handlers.MakeDeleteHandler(mqSender).ServeHTTP,
 		DeployHandler:  handlers.MakeDeployHandler(mqSender).ServeHTTP,
 		FunctionReader: handlers.MakeFunctionReader(mqSender).ServeHTTP,

@@ -12,7 +12,7 @@ import (
 func MakeReplicaUpdater(messageSender mq.MessageSender) VarsWrapper {
     return func(w http.ResponseWriter, r *http.Request, vars map[string]string) {
         serviceName := vars["name"]
-        updates := make(map[string]string)
+        updates := make(map[string]interface {})
         _, err := messageSender.UpdateService(serviceName, updates)
         if err != nil {
             w.WriteHeader(http.StatusInternalServerError)
@@ -35,15 +35,15 @@ func MakeReplicaReader(messageSender mq.MessageSender) VarsWrapper {
         replicaCounter := 0
         for _, sName := range services {
             if serviceName == sName {
-                counter ++
+                replicaCounter ++
             }
         }
-        if counter == 0 {
-            w.WriterHeader(http.StatusNotFound)
+        if replicaCounter == 0 {
+            w.WriteHeader(http.StatusNotFound)
             return
         }
         w.Header().Set("Content-Type", "application/json")
-        w.WriterHeader(http.StatusOK)
-        w.Write("Found Service")
+        w.WriteHeader(http.StatusOK)
+        w.Write([]byte("Found Service"))
     }
 }

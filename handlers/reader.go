@@ -4,6 +4,8 @@
 package handlers
 
 import (
+    "bytes"
+    "encoding/gob"
     "net/http"
 
     "github.com/stack360/faas-mq/mq"
@@ -16,7 +18,9 @@ func MakeFunctionReader(messageSender mq.MessageSender) VarsWrapper {
             http.Error(w, err.Error(), http.StatusInternalServerError)
             return
         }
-        functionBytes := []byte(functions[:])
+        buf := &bytes.Buffer{}
+        gob.NewEncoder(buf).Encode(functions)
+        functionBytes := buf.Bytes()
         w.Header().Set("Content-Type", "application/json")
         w.WriteHeader(http.StatusOK)
         w.Write(functionBytes)
