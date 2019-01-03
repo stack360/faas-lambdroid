@@ -6,7 +6,6 @@ WORKDIR /go/src/github.com/stack360/faas-mq
 
 COPY vendor      vendor
 COPY handlers    handlers
-COPY types       types
 COPY mq          mq
 COPY server.go   .
 
