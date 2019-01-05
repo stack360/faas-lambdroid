@@ -5,6 +5,7 @@ package handlers
 
 import (
     "encoding/json"
+    "log"
     "io/ioutil"
     "net/http"
 
@@ -14,6 +15,7 @@ import (
 
 func MakeDeployHandler(messageSender mq.MessageSender) VarsWrapper {
     return func(w http.ResponseWriter, r *http.Request, vars map[string]string) {
+        log.Println("aaaaaaaa")
         defer r.Body.Close()
         body, _ := ioutil.ReadAll(r.Body)
 

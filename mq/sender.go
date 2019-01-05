@@ -4,8 +4,9 @@
 package mq
 
 import (
-    "github.com/streadway/amqp"
     "errors"
+
+    "github.com/streadway/amqp"
 )
 
 // MessageSender acts like a client that triggers actions by sending messages to mq
@@ -19,24 +20,11 @@ type MessageSender interface {
 }
 
 type Sender struct {
-    mqChannel      *amqp.Channel
     config        *Config
 }
 
 func NewSenderFromConfig(config *Config) (MessageSender, error) {
-    conn, err := amqp.Dial(config.RabbitURL)
-    if err != nil {
-        return nil, errors.New("Could not connect to MQ!")
-    }
-    defer conn.Close()
-
-    ch, sErr := conn.Channel()
-    if sErr != nil {
-        return nil, errors.New("Could not open channel to create sender!")
-    }
-
     s := Sender{
-        mqChannel: ch,
         config:    config,
     }
     return &s, nil
@@ -44,7 +32,7 @@ func NewSenderFromConfig(config *Config) (MessageSender, error) {
 
 // TODO: Most of these functions are placeholders for now. Implement these after Android master app has the functionalities.
 func (s *Sender) ListServices() ([]string, error) {
-    services := []string{"send_sms", "send_email"}
+    services := []string{"send_email", "send_sms"}
     return services, nil
 }
 
@@ -69,7 +57,17 @@ func (s *Sender) UpdateService(serviceName string, updatedServiceSpec map[string
 
 func (s *Sender) InvokeService(serviceName string, serviceParams []byte) (string, error) {
     body := serviceParams
-    q, err := s.mqChannel.QueueDeclare(
+    conn, err := amqp.Dial(s.config.RabbitURL)
+    if err != nil {
+        return err.Error(), err
+    }
+    defer conn.Close()
+
+    ch, sErr := conn.Channel()
+    if sErr != nil {
+        return err.Error(), sErr
+    }
+    q, qErr := ch.QueueDeclare(
         serviceName,
         false,
         false,
@@ -77,11 +75,11 @@ func (s *Sender) InvokeService(serviceName string, serviceParams []byte) (string
         false,
         nil,
     )
-    if err != nil {
-        return "Error encountered when declaring queue.", errors.New(err.Error())
+    if qErr != nil {
+        return err.Error(), errors.New(err.Error())
     }
 
-    publishErr := s.mqChannel.Publish(
+    publishErr := ch.Publish(
         "",
         q.Name,
         false,

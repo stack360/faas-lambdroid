@@ -17,10 +17,12 @@ import (
 
 func main() {
 	rabbitURL := os.Getenv("RABBIT_URL")
+	stackName := os.Getenv("STACK_NAME")
 
 
 	// creates the MQ config
 	config, err := mq.NewMQConfig(
+		stackName,
 		rabbitURL,
 	)
 	if err != nil {

@@ -5,7 +5,9 @@ package handlers
 
 import (
     "net/http"
-
+    "encoding/json"
+    "fmt"
+    "strings"
     "github.com/stack360/faas-mq/mq"
 
     "io/ioutil"
@@ -19,10 +21,31 @@ func MakeProxy(messageSender mq.MessageSender, stackName string) VarsWrapper {
             return
         }
 
-        serviceName := vars["name"]
+        urlPath := r.URL.Path
+        if urlPath == "" {
+            w.WriteHeader(http.StatusInternalServerError)
+            return
+        }
+        s := strings.Split(urlPath, "/")
+        functionName := s[len(s)-1]
+
         serviceParams, _ := ioutil.ReadAll(r.Body)
+        paramsMap := make(map[string]string)
+        unmarshalErr := json.Unmarshal(serviceParams, &paramsMap)
+        if unmarshalErr != nil {
+            w.WriteHeader(http.StatusInternalServerError)
+            return
+        }
+        paramsMap["function"] = functionName
         defer r.Body.Close()
-        status, err := messageSender.InvokeService(serviceName, serviceParams)
+
+        params, marshalErr := json.Marshal(paramsMap)
+        if marshalErr != nil {
+            w.WriteHeader(http.StatusInternalServerError)
+            return
+        }
+        fmt.Println("Marshal successful: ", params)
+        status, err := messageSender.InvokeService(stackName, params)
         if err != nil {
             w.WriteHeader(http.StatusInternalServerError)
             w.Write([]byte(status))

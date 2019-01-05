@@ -9,9 +9,10 @@ type Config struct {
     RabbitURL string
 }
 
-func NewMQConfig(url string) (*Config, error) {
+func NewMQConfig(sn string, url string) (*Config, error) {
     config := Config{
-        RabbitURL: url,
+        FunctionsStackName: sn,
+        RabbitURL:          url,
     }
     return &config, nil
 }

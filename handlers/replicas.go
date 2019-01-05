@@ -4,9 +4,12 @@
 package handlers
 
 import (
+    "encoding/json"
     "net/http"
+    "strings"
 
     "github.com/stack360/faas-mq/mq"
+    "github.com/openfaas/faas/gateway/requests"
 )
 
 func MakeReplicaUpdater(messageSender mq.MessageSender) VarsWrapper {
@@ -25,25 +28,34 @@ func MakeReplicaUpdater(messageSender mq.MessageSender) VarsWrapper {
 
 func MakeReplicaReader(messageSender mq.MessageSender) VarsWrapper {
     return func(w http.ResponseWriter, r *http.Request, vars map[string]string) {
-        serviceName := vars["name"]
-        services, err := messageSender.ListServices()
+        urlPath := r.URL.Path
+        if urlPath == "" {
+            w.WriteHeader(http.StatusInternalServerError)
+            return
+        }
+        s := strings.Split(urlPath, "/")
+        functionName := s[len(s)-1]
+        functions, err := getFunctions(messageSender)
         if err != nil {
             w.WriteHeader(http.StatusInternalServerError)
             return
         }
 
-        replicaCounter := 0
-        for _, sName := range services {
-            if serviceName == sName {
-                replicaCounter ++
+        var found *requests.Function
+        for _, function := range functions {
+            if function.Name == functionName {
+                found = &function
+                break
             }
         }
-        if replicaCounter == 0 {
+
+        if found == nil {
             w.WriteHeader(http.StatusNotFound)
             return
         }
+        functionBytes, _ := json.Marshal(found)
         w.Header().Set("Content-Type", "application/json")
         w.WriteHeader(http.StatusOK)
-        w.Write([]byte("Found Service"))
+        w.Write(functionBytes)
     }
 }
