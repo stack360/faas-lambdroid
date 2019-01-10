@@ -32,7 +32,7 @@ func NewSenderFromConfig(config *Config) (MessageSender, error) {
 
 // TODO: Most of these functions are placeholders for now. Implement these after Android master app has the functionalities.
 func (s *Sender) ListServices() ([]string, error) {
-    services := []string{"send_email", "send_sms"}
+    services := []string{"labelmaker2"}
     return services, nil
 }
 

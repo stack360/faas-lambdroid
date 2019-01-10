@@ -30,13 +30,14 @@ func MakeProxy(messageSender mq.MessageSender, stackName string) VarsWrapper {
         functionName := s[len(s)-1]
 
         serviceParams, _ := ioutil.ReadAll(r.Body)
-        paramsMap := make(map[string]string)
+        paramsMap := make(map[string]interface{})
         unmarshalErr := json.Unmarshal(serviceParams, &paramsMap)
         if unmarshalErr != nil {
             w.WriteHeader(http.StatusInternalServerError)
             return
         }
-        paramsMap["function"] = functionName
+        paramsMap["action_type"] = "run_app"
+        paramsMap["action_name"] = functionName
         defer r.Body.Close()
 
         params, marshalErr := json.Marshal(paramsMap)
