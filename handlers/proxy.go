@@ -8,14 +8,13 @@ import (
     "encoding/json"
     "fmt"
     "strings"
-    "github.com/stack360/faas-mq/mq"
+    "github.com/stack360/faas-lambdroid/lambdroid"
 
     "io/ioutil"
 )
 
-func MakeProxy(messageSender mq.MessageSender, stackName string) VarsWrapper {
+func MakeProxy(towerClient lambdroid.LambdroidTowerClient, stackName string) VarsWrapper {
     return func(w http.ResponseWriter, r *http.Request, vars map[string]string) {
-
         if r.Method != "POST" {
             w.WriteHeader(http.StatusBadRequest)
             return
@@ -46,7 +45,7 @@ func MakeProxy(messageSender mq.MessageSender, stackName string) VarsWrapper {
             return
         }
         fmt.Println("Marshal successful: ", params)
-        status, err := messageSender.InvokeService(stackName, params)
+        status, err := towerClient.InvokeService(stackName, params)
         if err != nil {
             w.WriteHeader(http.StatusInternalServerError)
             w.Write([]byte(status))

@@ -10,31 +10,31 @@ import (
 
 	"github.com/openfaas/faas-provider"
 	bootTypes "github.com/openfaas/faas-provider/types"
-	"github.com/stack360/faas-mq/handlers"
-	"github.com/stack360/faas-mq/mq"
+	"github.com/stack360/faas-lambdroid/handlers"
+	"github.com/stack360/faas-lambdroid/lambdroid"
 )
 
 
 func main() {
-	rabbitURL := os.Getenv("RABBIT_URL")
+	towerURL := os.Getenv("LAMBDROID_TOWER_URL")
 	stackName := os.Getenv("STACK_NAME")
 
 
-	// creates the MQ config
-	config, err := mq.NewMQConfig(
+	// creates the tower client config object
+	config, err := lambdroid.NewClientConfig(
 		stackName,
-		rabbitURL,
+		towerURL,
 	)
 	if err != nil {
 		panic(err.Error())
 	}
 
-	// create the message sender
-	mqSender, err := mq.NewSenderFromConfig(config)
+	// create the lambdroid lambdroid tower client
+	towerClient, err := lambdroid.NewTowerClientFromConfig(config)
 	if err != nil {
 		panic(err.Error())
 	}
-	fmt.Println("Created New MQ Sender.")
+	fmt.Println("Created New Tower Client.")
 
 /*
 	proxyClient := http.Client{
@@ -52,12 +52,12 @@ func main() {
 	}
 	*/
 	bootstrapHandlers := bootTypes.FaaSHandlers{
-		FunctionProxy:  handlers.MakeProxy(mqSender, config.FunctionsStackName).ServeHTTP,
-		DeleteHandler:  handlers.MakeDeleteHandler(mqSender).ServeHTTP,
-		DeployHandler:  handlers.MakeDeployHandler(mqSender).ServeHTTP,
-		FunctionReader: handlers.MakeFunctionReader(mqSender).ServeHTTP,
-		ReplicaReader:  handlers.MakeReplicaReader(mqSender).ServeHTTP,
-		ReplicaUpdater: handlers.MakeReplicaUpdater(mqSender).ServeHTTP,
+		FunctionProxy:  handlers.MakeProxy(towerClient, config.FunctionsStackName).ServeHTTP,
+		DeleteHandler:  handlers.MakeDeleteHandler(towerClient).ServeHTTP,
+		DeployHandler:  handlers.MakeDeployHandler(towerClient).ServeHTTP,
+		FunctionReader: handlers.MakeFunctionReader(towerClient).ServeHTTP,
+		ReplicaReader:  handlers.MakeReplicaReader(towerClient).ServeHTTP,
+		ReplicaUpdater: handlers.MakeReplicaUpdater(towerClient).ServeHTTP,
 	}
 	var port int
 	port = 8080

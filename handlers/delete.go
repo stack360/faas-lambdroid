@@ -9,10 +9,10 @@ import (
     "net/http"
 
     "github.com/openfaas/faas/gateway/requests"
-    "github.com/stack360/faas-mq/mq"
+    "github.com/stack360/faas-lambdroid/lambdroid"
 )
 
-func MakeDeleteHandler(messageSender mq.MessageSender) VarsWrapper {
+func MakeDeleteHandler(towerClient lambdroid.LambdroidTowerClient) VarsWrapper {
     return func(w http.ResponseWriter, r *http.Request, vars map[string]string) {
         defer r.Body.Close()
         body, _ := ioutil.ReadAll(r.Body)
@@ -29,7 +29,7 @@ func MakeDeleteHandler(messageSender mq.MessageSender) VarsWrapper {
             return
         }
 
-        service, getErr := messageSender.GetServiceByName(request.FunctionName)
+        service, getErr := towerClient.GetServiceByName(request.FunctionName)
         if getErr != nil {
             w.WriteHeader(http.StatusInternalServerError)
             return
@@ -37,7 +37,7 @@ func MakeDeleteHandler(messageSender mq.MessageSender) VarsWrapper {
             w.WriteHeader(http.StatusNotFound)
             return
         }
-        delErr := messageSender.DeleteService(request.FunctionName)
+        delErr := towerClient.DeleteService(request.FunctionName)
         if delErr != nil {
             w.WriteHeader(http.StatusBadRequest)
             return

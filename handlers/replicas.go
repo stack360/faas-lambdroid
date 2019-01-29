@@ -8,15 +8,15 @@ import (
     "net/http"
     "strings"
 
-    "github.com/stack360/faas-mq/mq"
+    "github.com/stack360/faas-lambdroid/lambdroid"
     "github.com/openfaas/faas/gateway/requests"
 )
 
-func MakeReplicaUpdater(messageSender mq.MessageSender) VarsWrapper {
+func MakeReplicaUpdater(towerClient lambdroid.LambdroidTowerClient) VarsWrapper {
     return func(w http.ResponseWriter, r *http.Request, vars map[string]string) {
         serviceName := vars["name"]
         updates := make(map[string]interface {})
-        _, err := messageSender.UpdateService(serviceName, updates)
+        _, err := towerClient.UpdateService(serviceName, updates)
         if err != nil {
             w.WriteHeader(http.StatusInternalServerError)
             w.Write([]byte(err.Error()))
@@ -26,7 +26,7 @@ func MakeReplicaUpdater(messageSender mq.MessageSender) VarsWrapper {
     }
 }
 
-func MakeReplicaReader(messageSender mq.MessageSender) VarsWrapper {
+func MakeReplicaReader(towerClient lambdroid.LambdroidTowerClient) VarsWrapper {
     return func(w http.ResponseWriter, r *http.Request, vars map[string]string) {
         urlPath := r.URL.Path
         if urlPath == "" {
@@ -35,7 +35,7 @@ func MakeReplicaReader(messageSender mq.MessageSender) VarsWrapper {
         }
         s := strings.Split(urlPath, "/")
         functionName := s[len(s)-1]
-        functions, err := getFunctions(messageSender)
+        functions, err := getFunctions(towerClient)
         if err != nil {
             w.WriteHeader(http.StatusInternalServerError)
             return

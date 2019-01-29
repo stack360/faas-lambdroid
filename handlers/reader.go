@@ -7,13 +7,13 @@ import (
     "encoding/json"
     "net/http"
 
-    "github.com/stack360/faas-mq/mq"
+    "github.com/stack360/faas-lambdroid/lambdroid"
     "github.com/openfaas/faas/gateway/requests"
 )
 
-func MakeFunctionReader(messageSender mq.MessageSender) VarsWrapper {
+func MakeFunctionReader(towerClient lambdroid.LambdroidTowerURL) VarsWrapper {
     return func(w http.ResponseWriter, r *http.Request, vars map[string]string) {
-        functions, err := getFunctions(messageSender)
+        functions, err := getFunctions(towerClient)
         if err != nil {
             http.Error(w, err.Error(), http.StatusInternalServerError)
             return
@@ -30,10 +30,10 @@ func MakeFunctionReader(messageSender mq.MessageSender) VarsWrapper {
     }
 }
 
-func getFunctions(messageSender mq.MessageSender) ([]requests.Function, error) {
+func getFunctions(towerClient lambdroid.LambdroidTowerClient) ([]requests.Function, error) {
     functions := []requests.Function{}
 
-    services, err := messageSender.ListServices()
+    services, err := towerClient.ListServices()
     if err != nil {
         return nil, err
     }

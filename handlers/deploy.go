@@ -10,10 +10,10 @@ import (
     "net/http"
 
     "github.com/openfaas/faas/gateway/requests"
-    "github.com/stack360/faas-mq/mq"
+    "github.com/stack360/faas-lambdroid/lambdroid"
 )
 
-func MakeDeployHandler(messageSender mq.MessageSender) VarsWrapper {
+func MakeDeployHandler(towerClient lambdroid.LambdroidTowerClient) VarsWrapper {
     return func(w http.ResponseWriter, r *http.Request, vars map[string]string) {
         log.Println("aaaaaaaa")
         defer r.Body.Close()
@@ -26,7 +26,7 @@ func MakeDeployHandler(messageSender mq.MessageSender) VarsWrapper {
             return
         }
         serviceSpec := map[string]interface{} {}
-        _, addErr := messageSender.AddService(serviceSpec)
+        _, addErr := towerClient.AddService(serviceSpec)
         if addErr != nil {
             w.WriteHeader(http.StatusInternalServerError)
             w.Write([]byte(addErr.Error()))
