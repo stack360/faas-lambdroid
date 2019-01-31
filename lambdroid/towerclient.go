@@ -25,7 +25,11 @@ type Client struct {
 
 func NewTowerClientFromConfig(config *Config) (LambdroidTowerClient, error) {
     c := client.NewClient(config.LambdroidTowerURL)
-    return c, nil
+    client := Client {
+        towerClient:   c,
+        config:        config,
+    }
+    return &client, nil
 }
 
 // TODO: Most of these functions are placeholders for now. Implement these after Lambdroid master app has the functionalities.
@@ -54,8 +58,7 @@ func (c *Client) UpdateService(serviceName string, updatedServiceSpec map[string
 }
 
 func (c *Client) InvokeService(serviceName string, serviceParams []byte) (string, error) {
-    body := serviceParams
-    status, err := c.RunFunction(serviceName, serviceParams)
+    status, err := c.towerClient.RunFunction(serviceName, serviceParams)
     if err != nil {
         return "Error when invoking service", err
     }

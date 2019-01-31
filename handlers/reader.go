@@ -11,7 +11,7 @@ import (
     "github.com/openfaas/faas/gateway/requests"
 )
 
-func MakeFunctionReader(towerClient lambdroid.LambdroidTowerURL) VarsWrapper {
+func MakeFunctionReader(towerClient lambdroid.LambdroidTowerClient) VarsWrapper {
     return func(w http.ResponseWriter, r *http.Request, vars map[string]string) {
         functions, err := getFunctions(towerClient)
         if err != nil {
