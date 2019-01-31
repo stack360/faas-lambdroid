@@ -4,9 +4,6 @@
 package lambdroid
 
 import (
-    "errors"
-
-    "github.com/streadway/amqp"
     "github.com/stack360/go-lambdroid-tower"
 )
 
@@ -20,9 +17,15 @@ type LambdroidTowerClient interface {
     InvokeService(serviceName string, serviceParams []byte) (string, error)
 }
 
+// Client is the REST Client type
+type Client struct {
+    towerClient *client.Client
+    config      *Config
+}
+
 func NewTowerClientFromConfig(config *Config) (LambdroidTowerClient, error) {
     c := client.NewClient(config.LambdroidTowerURL)
-    return &c, nil
+    return c, nil
 }
 
 // TODO: Most of these functions are placeholders for now. Implement these after Lambdroid master app has the functionalities.
